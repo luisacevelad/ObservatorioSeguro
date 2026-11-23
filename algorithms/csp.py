@@ -60,8 +60,34 @@ def backtracking_search(csp, domains=None, select_variable=None,
                 trace.restore(parent, snapshot(parent), variable)
         return result
 
-    # TODO: Add your code here
-    raise NotImplementedError
+
+    def expand(assignment):
+
+        if len(assignment) == len(csp.variables):
+            return assignment
+
+        # Elegir la siguiente tarea pendiente
+        variable = choose(csp, assignment, domains)
+
+        # Obtener los valores que podemos probar
+        for value in ordered(csp, variable, assignment, domains):
+
+            # Comprobar si el valor es compatible con la asignación que tenemos actualmente
+            if consistent(variable, value, assignment):
+
+                # Crear una asignación independiente
+                new_assignment = dict(assignment)
+                new_assignment[variable] = value
+
+                # Continuar la búsqueda de manera recursiva
+                result = search(new_assignment)
+
+                # Si se encuentra una solución se retorna
+                if result is not None:
+                    return result
+
+        return None
+
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
     return search({})
@@ -78,8 +104,23 @@ def revise(csp, x, y, domains):
       entre ese par de tareas, respetando la dirección de las precedencias.
     - Si elimina elementos mientras recorre una lista, itere sobre una copia.
     """
-    # TODO: Add your code here
-    raise NotImplementedError
+    revised = False
+
+    # Revisar cada valor del dominio de x
+    for value_x in list(domains[x]):
+
+        # Comprobar si existe al menos un valor compatible en y
+        has_support = any(
+            csp.compatible(x, value_x, y, value_y)
+            for value_y in domains[y]
+        )
+
+        # Si no tiene soporte, se elimina del dominio de X.
+        if not has_support:
+            domains[x].remove(value_x)
+            revised = True
+
+    return revised
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -93,8 +134,32 @@ def ac3(csp, domains):
       csp.neighbors[x] contiene los vecinos de x.
     - revise(csp, x, y, domains) retorna si modificó domains[x].
     """
-    # TODO: Add your code here
-    raise NotImplementedError
+    # Inicializar la cola con todos los arcos del problema
+    queue = deque(
+        (x, y)
+        for x in csp.variables
+        for y in csp.neighbors[x]
+    )
+    
+    while queue:
+
+        x, y = queue.popleft()
+
+        # Revisar si x necesita reducir su dominio respecto a y
+        if revise(csp, x, y, domains):
+
+            # Si el dominio queda vacío, no existe consistencia de arcos.
+            if not domains[x]:
+                return False
+
+            # Los cambios en x pueden afectar a sus otros vecinos.
+            for neighbor in csp.neighbors[x]:
+
+                if neighbor != y:
+                    queue.append((neighbor, x))
+                    
+    return True
+  
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
