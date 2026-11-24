@@ -107,8 +107,16 @@ def select_unassigned_variable(csp, assignment, domains):
     - csp.neighbors[x] contiene sus vecinos; csp.variables conserva el orden
       original para los desempates.
     """
-    # TODO: Add your code here
-    raise NotImplementedError
+    best, best_key = None, None
+    for index, x in enumerate(csp.variables):
+        if x in assignment:
+            continue
+        legal = sum(1 for v in domains[x] if csp.consistent(x, v, assignment))
+        degree = sum(1 for n in csp.neighbors[x] if n not in assignment)
+        key = (legal, -degree, index)
+        if best_key is None or key < best_key:
+            best, best_key = x, key
+    return best
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
 
@@ -125,6 +133,18 @@ def order_domain_values(csp, variable, assignment, domains):
     - csp.compatible(variable, valor, vecino, valor_vecino) comprueba cada par
       sin modificar los dominios.
     """
-    # TODO: Add your code here
-    raise NotImplementedError
+    candidates = [v for v in domains[variable]
+                  if csp.consistent(variable, v, assignment)]
+    pending = [n for n in csp.neighbors[variable] if n not in assignment]
+
+    def ruled_out(value):
+        count = 0
+        for n in pending:
+            for u in domains[n]:
+                if csp.consistent(n, u, assignment) and \
+                   not csp.compatible(variable, value, n, u):
+                    count += 1
+        return count
+
+    return sorted(candidates, key=ruled_out)
     # FIN DEL BLOQUE DEL ESTUDIANTE
