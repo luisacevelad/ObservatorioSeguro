@@ -18,5 +18,26 @@ def forward_chain(kb):
       con las variables reemplazadas por los valores de la sustitución.
     """
     # TODO: Add your code here
-    raise NotImplementedError
+    facts = list(dict.fromkeys(kb.facts))
+
+    while True:
+        new_facts = []
+
+        for rule in kb.rules:
+            for substitution, used_facts in match_premises(
+                rule.premises, facts
+            ):
+                conclusion = substitute(
+                    rule.conclusion, substitution
+                )
+
+                if conclusion not in facts and conclusion not in new_facts:
+                    new_facts.append(conclusion)
+
+        if not new_facts:
+            break
+
+        facts.extend(new_facts)
+
+    return tuple(facts)
     # FIN DEL BLOQUE DEL ESTUDIANTE

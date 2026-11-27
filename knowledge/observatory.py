@@ -33,5 +33,62 @@ def build_rules():
       la conjunción; las variables de la regla se interpretan universalmente.
     """
     # TODO: Add your code here
-    raise NotImplementedError
+    r1 = Rule(
+        "R1",
+        "Competencia del tecnico",
+        (
+            atom("Asignado", "?t", "?p"),
+            atom("Requiere", "?t", "?e"),
+            atom("Habilitado", "?p", "?e"),
+        ),
+        atom("Competente", "?p", "?t")
+    )
+
+    r2 = Rule(
+        "R2",
+        "Preparacion de la tarea",
+        (
+            atom("EnZona", "?t", "?z"),
+            atom("AislamientoConfirmado", "?z", "?f"),
+            atom("SinAlertaConfirmada", "?z", "?f"),
+        ),
+        atom("Preparada", "?t", "?f")
+    )
+
+    r3 = Rule(
+        "R3",
+        "Autorizacion de la tarea",
+        (
+            atom("Programada", "?t", "?f"),
+            atom("Asignado", "?t", "?p"),
+            atom("Disponible", "?p", "?f"),
+            atom("Competente", "?p", "?t"),
+            atom("Preparada", "?t", "?f"),
+        ),
+        atom("Autorizada", "?t", "?f")
+    )
+
+    r4 = Rule(
+        "R4",
+        "Bloqueo por alerta",
+        (
+            atom("Programada", "?t", "?f"),
+            atom("EnZona", "?t", "?z"),
+            atom("Alerta", "?z", "?f"),
+        ),
+        atom("Bloqueada", "?t", "?f")
+    )
+
+    r5 = Rule(
+        "R5",
+        "Bloqueo por aislamiento fallido",
+        (
+            atom("Programada", "?t", "?f"),
+            atom("EnZona", "?t", "?z"),
+            atom("AislamientoFallido", "?z", "?f"),
+        ),
+        atom("Bloqueada", "?t", "?f")
+    )
+
+    return (r1, r2, r3, r4, r5)
     # FIN DEL BLOQUE DEL ESTUDIANTE
