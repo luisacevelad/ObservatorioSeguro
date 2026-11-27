@@ -134,6 +134,10 @@ def ac3(csp, domains):
       csp.neighbors[x] contiene los vecinos de x.
     - revise(csp, x, y, domains) retorna si modificó domains[x].
     """
+    # Un dominio ya vacío es inconsistente, incluso si la tarea no tiene vecinos.
+    if any(not domains[x] for x in csp.variables):
+        return False
+
     # Inicializar la cola con todos los arcos del problema
     queue = deque(
         (x, y)
